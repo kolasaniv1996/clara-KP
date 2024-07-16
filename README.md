@@ -6,10 +6,19 @@ This project sets up distributed training for a model using the Camelyon16 datas
 
 ## Prerequisites
 
+- Docker
+- NVIDIA Clara SDK
 - Python 3.6+
 - PyTorch
 - Hugging Face `datasets` library
 
+## Setup
+
+### Clone the Repository
+
+```bash
+git clone <repository_url>
+cd <repository_name>
 ## Setup
 
 ### Install Dependencies
