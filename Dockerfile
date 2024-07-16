@@ -1,4 +1,4 @@
-FROM https://nvcr.io/nvidia/clara-train-sdk:v4.1
+FROM nvcr.io/nvidia/clara-train-sdk:v4.1
 
 RUN pip install torch datasets
 
