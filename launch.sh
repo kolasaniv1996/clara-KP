@@ -13,4 +13,4 @@ echo "WORLD_SIZE: ${WORLD_SIZE}"
 # echo "RANK: ${RANK}"
 
 # Run the training script using torchrun
-torchrun --nproc_per_node=1 --nnodes=${WORLD_SIZE} --rdzv_endpoint=${MASTER_ADDR}:${MASTER_PORT} --rdzv_backend=c10d distributed.py --batch_size 8 30 2
+torchrun --nproc_per_node=1 --nnodes=${WORLD_SIZE} --rdzv_endpoint=${MASTER_ADDR}:${MASTER_PORT} --rdzv_backend=c10d camelyon.py --batch_size 8 30 2
