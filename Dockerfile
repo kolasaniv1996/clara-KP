@@ -2,8 +2,12 @@ FROM nvcr.io/nvidia/clara-train-sdk:v4.1
 
 RUN pip install torch torchvision datasets
 
+RUN mkdir /home/local/data
+
 # Set the working directory 
 WORKDIR /app
+
+
 
 # Copy the current directory contents into the container at /app 
 COPY camelyon.py launch.sh /app/
