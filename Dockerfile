@@ -10,7 +10,7 @@ WORKDIR /app
 
 
 # Copy the current directory contents into the container at /app 
-COPY camelyon.py launch.sh /app/
+COPY distributed.py launch.sh /home/local/data/
 
 # Run the bash file
 RUN chmod u+x launch.sh
