@@ -1,6 +1,6 @@
 FROM nvcr.io/nvidia/clara-train-sdk:v4.1
 
-RUN pip install torch datasets
+RUN pip install torch torchvision datasets
 
 # Set the working directory 
 WORKDIR /app
