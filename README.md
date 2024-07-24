@@ -1,51 +1,39 @@
-# clara-camelyon16
+This repository contains a script for training a UNet model for brain MRI segmentation using a distributed training setup with PyTorch. The script utilizes the Clara image for loading and processing the data.
 
-# Distributed Training with Camelyon16 Dataset
+## Requirements
 
-This project sets up distributed training for a model using the Camelyon16 dataset. It leverages PyTorch's distributed training capabilities and the dataset available on Hugging Face.
-
-## Prerequisites
-
-- Docker
-- NVIDIA Clara SDK
-- Python 3.6+
-- PyTorch
-- Hugging Face `datasets` library
+- Python 3.7+
+- PyTorch 1.7.1+
+- Torchvision 0.8.2+
+- PIL (Pillow)
+- numpy
 
 ## Setup
 
-### Clone the Repository
+1. **Clone the Repository**:
 
-```bash
-git clone <repository_url>
-cd <repository_name>
-## Setup
+    ```sh
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
 
-### Install Dependencies
+2. **Install Dependencies**:
 
-1. Install PyTorch following the instructions on [PyTorch's website](https://pytorch.org/get-started/locally/).
-2. Install the Hugging Face `datasets` library:
+    Install the required Python packages:
 
-```bash
-pip install datasets
+    ```sh
+    pip install torch torchvision pillow numpy
+    ```
 
-Usage
-Environment Variables
-Before running the training script, ensure the following environment variables are set:
+3. **Download the Model and Dataset**:
 
-MASTER_ADDR: The address of the master node.
-MASTER_PORT: The port on which the master node will communicate.
-WORLD_SIZE: The total number of nodes participating in the job.
+    The script will automatically download the pre-trained model and the sample brain MRI image dataset when you run it.
 
-camelyon.py script sets up distributed training using PyTorch's torchrun. The dataset is loaded from Hugging Face.
+## Usage
 
+### Running the Training Script
 
+To start the training process, simply run the script:
 
-
-RUNAI CLI Command :-
-
-
-runai submit-dist pytorch --name clara-clara-camelyon16 --workers=3 --max-replicas 4 --min-replicas 2 -g 1 -i docker.io/vivekkolasani1996/clara-4:v1
-
-
-docker.io/vivekkolasani1996/clara-4:v1 is the image build from the dockerfile
+```sh
+python train.py
