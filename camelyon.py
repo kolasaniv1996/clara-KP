@@ -22,14 +22,19 @@ class Camelyon16Dataset(Dataset):
         return image, label
 
 def ddp_setup():
-    init_process_group(backend="nccl")
-    torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+    if torch.cuda.is_available():
+        init_process_group(backend="nccl")
+        torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+    else:
+        print("No GPUs available. Running on CPU.")
+        init_process_group(backend="gloo")  # Use Gloo backend for CPU
 
 class Trainer:
     def __init__(self, model, train_data, optimizer, save_every, snapshot_path):
-        self.local_rank = int(os.environ["LOCAL_RANK"])
-        self.global_rank = int(os.environ["RANK"])
-        self.model = model.to(self.local_rank)
+        self.local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        self.global_rank = int(os.environ.get("RANK", 0))
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = model.to(self.device)
         self.train_data = train_data
         self.optimizer = optimizer
         self.save_every = save_every
@@ -38,10 +43,11 @@ class Trainer:
         if os.path.exists(snapshot_path):
             print("Loading snapshot")
             self._load_snapshot(snapshot_path)
-        self.model = DDP(self.model, device_ids=[self.local_rank])
+        if torch.cuda.is_available():
+            self.model = DDP(self.model, device_ids=[self.local_rank])
 
     def _load_snapshot(self, snapshot_path):
-        loc = f"cuda:{self.local_rank}"
+        loc = f"cuda:{self.local_rank}" if torch.cuda.is_available() else "cpu"
         snapshot = torch.load(snapshot_path, map_location=loc)
         self.model.load_state_dict(snapshot["MODEL_STATE"])
         self.epochs_run = snapshot["EPOCHS_RUN"]
@@ -56,16 +62,16 @@ class Trainer:
 
     def _run_epoch(self, epoch):
         b_sz = len(next(iter(self.train_data))[0])
-        print(f"[GPU{self.global_rank}] Epoch {epoch} | Batchsize: {b_sz} | Steps: {len(self.train_data)}")
+        print(f"[Rank {self.global_rank}] Epoch {epoch} | Batchsize: {b_sz} | Steps: {len(self.train_data)}")
         self.train_data.sampler.set_epoch(epoch)
         for source, targets in self.train_data:
-            source = source.to(self.local_rank)
-            targets = targets.to(self.local_rank)
+            source = source.to(self.device)
+            targets = targets.to(self.device)
             self._run_batch(source, targets)
 
     def _save_snapshot(self, epoch):
         snapshot = {
-            "MODEL_STATE": self.model.module.state_dict(),
+            "MODEL_STATE": self.model.module.state_dict() if torch.cuda.is_available() else self.model.state_dict(),
             "EPOCHS_RUN": epoch,
         }
         torch.save(snapshot, self.snapshot_path)
@@ -93,9 +99,9 @@ def prepare_dataloader(dataset: Dataset, batch_size: int):
     return DataLoader(
         dataset,
         batch_size=batch_size,
-        pin_memory=True,
+        pin_memory=True if torch.cuda.is_available() else False,
         shuffle=False,
-        sampler=DistributedSampler(dataset)
+        sampler=DistributedSampler(dataset) if torch.cuda.is_available() else None
     )
 
 def main(save_every: int, total_epochs: int, batch_size: int, snapshot_path: str = "snapshot.pt"):
