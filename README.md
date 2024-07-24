@@ -33,7 +33,14 @@ This repository contains a script for training a UNet model for brain MRI segmen
 
 ### Running the Training Script
 
-To start the training process, simply run the script:
+To start the training process using runai cli
 
-```sh
-python train.py
+
+./runai submit-pytorch -i vivekkolasani1996/clara-v4:v8 --workers=2 -g 1
+
+
+
+
+
+
+
