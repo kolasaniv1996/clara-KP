@@ -20,12 +20,12 @@ def download_model():
     # Download and save the model to a specific path
     model = torch.hub.load('mateuszbuda/brain-segmentation-pytorch', 'unet',
         in_channels=3, out_channels=1, init_features=32, pretrained=True)
-    model_path = "/home/local/data/unet_model.pth"
+    model_path = "/app/unet_model.pth"
     torch.save(model.state_dict(), model_path)
     return model_path
 
 def load_image():
-    url, filename = ("https://github.com/mateuszbuda/brain-segmentation-pytorch/raw/master/assets/brain-mri-lgg.png", "/home/local/data/brain-mri-lgg.png")
+    url, filename = ("https://github.com/mateuszbuda/brain-segmentation-pytorch/raw/master/assets/brain-mri-lgg.png", "/app/data/brain-mri-lgg.png")
     if not os.path.exists(filename):
         import urllib.request
         urllib.request.urlretrieve(url, filename)
